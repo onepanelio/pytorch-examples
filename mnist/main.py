@@ -1,5 +1,6 @@
 from __future__ import print_function
 import argparse
+import json
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -65,6 +66,7 @@ def test(args, model, device, test_loader):
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         test_loss, correct, len(test_loader.dataset),
         100. * correct / len(test_loader.dataset)))
+    return test_loss, correct
 
 
 def main():
@@ -87,10 +89,13 @@ def main():
     parser.add_argument('--log-interval', type=int, default=10, metavar='N',
                         help='how many batches to wait before logging training status')
 
-    parser.add_argument('--save-model', action='store_true', default=False,
+    parser.add_argument('--save-model', action='store_true', default=True,
                         help='For Saving the current Model')
     args = parser.parse_args()
     use_cuda = not args.no_cuda and torch.cuda.is_available()
+    
+    test_loss = 0
+    correct = 0
 
     torch.manual_seed(args.seed)
 
@@ -98,14 +103,14 @@ def main():
 
     kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
     train_loader = torch.utils.data.DataLoader(
-        datasets.MNIST('../data', train=True, download=True,
+        datasets.MNIST('/mnt/data', train=True, download=True,
                        transform=transforms.Compose([
                            transforms.ToTensor(),
                            transforms.Normalize((0.1307,), (0.3081,))
                        ])),
         batch_size=args.batch_size, shuffle=True, **kwargs)
     test_loader = torch.utils.data.DataLoader(
-        datasets.MNIST('../data', train=False, transform=transforms.Compose([
+        datasets.MNIST('/mnt/data', train=False, transform=transforms.Compose([
                            transforms.ToTensor(),
                            transforms.Normalize((0.1307,), (0.3081,))
                        ])),
@@ -117,9 +122,18 @@ def main():
     scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
     for epoch in range(1, args.epochs + 1):
         train(args, model, device, train_loader, optimizer, epoch)
-        test(args, model, device, test_loader)
+        test_loss, correct = test(args, model, device, test_loader)
         scheduler.step()
-
+    
+    metrics = {
+        'metrics': [{
+          'accuracy': correct,
+          'loss': test_loss
+        }]
+    }
+    with open('/tmp/metrics.json', 'w') as f:
+        json.dump(metrics, f)
+    
     if args.save_model:
         torch.save(model.state_dict(), "mnist_cnn.pt")
 

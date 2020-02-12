@@ -126,10 +126,10 @@ def main():
         scheduler.step()
     
     metrics = {
-        'metrics': [{
+        'metrics': {
           'accuracy': correct,
           'loss': test_loss
-        }]
+        }
     }
     with open('/tmp/metrics.json', 'w') as f:
         json.dump(metrics, f)

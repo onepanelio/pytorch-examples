@@ -125,12 +125,10 @@ def main():
         test_loss, correct = test(args, model, device, test_loader)
         scheduler.step()
     
-    metrics = {
-        'metrics': [
-            {'name': 'accuracy', 'value': correct},
-            {'name': 'loss', 'value': test_loss},
-        ]
-    }
+    metrics = [
+        {'name': 'accuracy', 'value': correct},
+        {'name': 'loss', 'value': test_loss},
+    ]
     with open('/tmp/metrics.json', 'w') as f:
         json.dump(metrics, f)
     

@@ -133,7 +133,7 @@ def main():
         json.dump(metrics, f)
     
     if args.save_model:
-        torch.save(model.state_dict(), "/mnt/data/mnist_cnn.pt")
+        torch.save(model.state_dict(), "/mnt/output/mnist_cnn.pt")
 
 
 if __name__ == '__main__':

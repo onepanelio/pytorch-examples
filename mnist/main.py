@@ -126,16 +126,16 @@ def main():
         scheduler.step()
     
     metrics = {
-        'metrics': {
-          'accuracy': correct,
-          'loss': test_loss
-        }
+        'metrics': [
+            {'name': 'accuracy', 'value': correct},
+            {'name': 'loss', 'value': test_loss},
+        ]
     }
     with open('/tmp/metrics.json', 'w') as f:
         json.dump(metrics, f)
     
     if args.save_model:
-        torch.save(model.state_dict(), "mnist_cnn.pt")
+        torch.save(model.state_dict(), "/mnt/data/mnist_cnn.pt")
 
 
 if __name__ == '__main__':

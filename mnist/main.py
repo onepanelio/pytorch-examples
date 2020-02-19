@@ -129,7 +129,7 @@ def main():
         {'name': 'accuracy', 'value': correct},
         {'name': 'loss', 'value': test_loss},
     ]
-    with open('/tmp/metrics.json', 'w') as f:
+    with open('/tmp/sys-metrics.json', 'w') as f:
         json.dump(metrics, f)
     
     if args.save_model:

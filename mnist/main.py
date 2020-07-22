@@ -138,7 +138,7 @@ def main():
     run = client.set_experiment_run(args.experiment_run)
     run.log_tags(['mnist-training'])
     run.log_hyperparameters({'batch_size':args.batch_size, 'learning_rate':args.lr, 'epochs':args.epochs, 'gamma':args.gamma})
-    run.log_metric("accuracy", correct)
+    run.log_metric("accuracy", 100. * correct / len(test_loader.dataset))
     run.log_metric("loss", test_loss)
     
 

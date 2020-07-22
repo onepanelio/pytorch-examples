@@ -136,7 +136,7 @@ def main():
     project = client.set_project("PyTorch MNIST Training")
     exp = client.set_experiment(args.experiment)
     run = client.set_experiment_run(args.experiment_run)
-    run.log_tags(['mnist-training'])
+    run.log_tags(['mnist-training',os.getenv('ONEPANEL_FQDN')+'/'+os.getenv('ONEPANEL_RESOURCE_NAMESPACE')+'/workflows/'+os.getenv('ONEPANEL_RESOURCE_UID')])
     run.log_hyperparameters({'batch_size':args.batch_size, 'learning_rate':args.lr, 'epochs':args.epochs, 'gamma':args.gamma})
     run.log_metric("accuracy", 100. * correct / len(test_loader.dataset))
     run.log_metric("loss", test_loss)

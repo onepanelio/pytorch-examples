@@ -7,6 +7,8 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.optim.lr_scheduler import StepLR
+from verta import Client
+import os
 
 
 class Net(nn.Module):
@@ -124,7 +126,16 @@ def main():
         train(args, model, device, train_loader, optimizer, epoch)
         test_loss, correct = test(args, model, device, test_loader)
         scheduler.step()
-    
+
+    # log metrics into modeldb
+    client = Client(os.getenv('ONEPANEL_MODELDB_URL'), _connect=False)
+    client._conn.auth['onepanel-auth-token'] = os.getenv('ONEPANEL_AUTHORIZATION')
+    project = client.set_project("PyTorch MNIST Training")
+    run = client.set_experiment_run()
+    run.log_metric("accuracy", correct)
+    run.log_metric("loss", test_loss)
+
+    #metrics of workflow artifacts
     metrics = [
         {'name': 'accuracy', 'value': correct},
         {'name': 'loss', 'value': test_loss},

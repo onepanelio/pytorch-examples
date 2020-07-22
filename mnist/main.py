@@ -90,7 +90,8 @@ def main():
                         help='random seed (default: 1)')
     parser.add_argument('--log-interval', type=int, default=10, metavar='N',
                         help='how many batches to wait before logging training status')
-
+    parser.add_argument('--experiment',default='PyTorch Experiment',
+                        help='Give a name to this experiment')
     parser.add_argument('--save-model', action='store_true', default=True,
                         help='For Saving the current Model')
     args = parser.parse_args()
@@ -132,8 +133,11 @@ def main():
     client._conn.auth['onepanel-auth-token'] = os.getenv('ONEPANEL_AUTHORIZATION')
     project = client.set_project("PyTorch MNIST Training")
     run = client.set_experiment_run()
+    run.log_tags([args.experiment])
+    run.log_hyperparameters({'batch_size':args.batch_size, 'learning_rate':args.lr, 'epochs':args.epochs, 'gamma':args.gamma})
     run.log_metric("accuracy", correct)
     run.log_metric("loss", test_loss)
+    
 
     #metrics of workflow artifacts
     metrics = [
